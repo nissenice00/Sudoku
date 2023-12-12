@@ -1,0 +1,109 @@
+package Sudoku;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+
+public class SudokuController {
+	
+	public SudokuController(SudokuSolver sudoku) {
+		
+		SwingUtilities.invokeLater(() -> createWindow(sudoku, "SudokuSolver", 300, 300));
+		
+		}
+	
+		private void createWindow(SudokuSolver sudoku, String title, int width, int height) {
+			
+		JFrame frame = new JFrame(title);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		Container pane = frame.getContentPane();
+		
+		JPanel boardBack = new JPanel();
+		boardBack.setPreferredSize(new Dimension(300,300));
+		boardBack.setBackground(Color.lightGray);
+		GridLayout gl = new GridLayout(9,9);
+		boardBack.setLayout(gl);
+		gl.setHgap(2);
+		gl.setVgap(2);
+		JTextField[][] boxes = new JTextField[9][9];
+		for(int i = 0; i < 9; i++) {
+			for(int k = 0; k < 9; k++) {
+				JTextField box = new JTextField();
+				boxes[i][k] = box;
+				if((i < 3 || i > 5) && (k < 3 || k > 5)) {
+					box.setBackground(new Color(144,238,144));
+				}
+				if((k > 2 && k < 6) && (i > 2 && i < 6)) {
+					box.setBackground(new Color(144,238,144));
+				}
+				box.setHorizontalAlignment(JTextField.CENTER);
+				box.setFont(new Font("Helvetica", Font.PLAIN, 24));
+				boardBack.add(box);
+			}
+		}
+		pane.add(boardBack);
+		
+ 		
+		JPanel bottom = new JPanel();
+		JButton solve = new JButton("Solve");
+		solve.addActionListener(e -> {
+			for(int c = 0; c < 9; c++) {
+				for(int r = 0; r < 9; r++) {
+					String valueText = boxes[r][c].getText();
+					try {
+			            int intValue = Integer.parseInt(valueText);
+			            sudoku.set(r, c, intValue);
+			        } catch (NumberFormatException n) {
+			        	sudoku.set(r, c, 0);
+			        }
+				}
+			}
+			
+			if(sudoku.solve()) {
+				int[][] result = new int[9][9];
+				result = sudoku.getGrid();
+				for(int c = 0; c < 9; c++) {
+					for(int r = 0; r < 9; r++) {
+						boxes[c][r].setText(String.valueOf(result[c][r]));
+				}
+			}		
+		} else {
+			//JOptionPane wrong = new JOptionPane("Wrong input");
+		    //JOptionPane.showMessageDialog(wrong, "please only enter numbers between 1-9");
+		}
+		});
+		JButton clear = new JButton("Clear");
+		clear.addActionListener(e -> {
+			sudoku.clearAll();
+			for(int r = 0; r < 9; r++) {
+				for(int c = 0; c < 9; c++) {
+					boxes[r][c].setText("");
+				}
+			}
+		});
+		
+		
+		bottom.add(solve);
+		bottom.add(clear);
+		pane.add(bottom, BorderLayout.SOUTH);
+		
+		frame.pack();
+		frame.setVisible(true);
+	}
+		
+public static void main(String[] args) {
+	SudokuSolver sudoku = new Sudoku();
+	SudokuController controller = new SudokuController(sudoku);
+}
+}
