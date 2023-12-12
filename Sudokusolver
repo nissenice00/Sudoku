@@ -1,0 +1,181 @@
+package Sudoku;
+
+public class Sudoku implements SudokuSolver {
+	private int[][] board;
+	private boolean[][] boardCorrect;
+	
+	public Sudoku() {
+		board = new int[9][9];
+		boardCorrect = new boolean[9][9];
+	}
+	
+
+	@Override
+	public boolean solve() {
+		return solve(0, 0);
+		// TODO Auto-generated method stub
+	}
+	/* Behövs
+	 * Något som plussar på nya siffran
+	 * Ett basfall
+	 * En if-sats som bestämmer när det är dags att hoppa ner (row = 8???)
+	 * rekrusiv metod, returnerar????
+	 * 
+	 */
+	private boolean solve(int r, int c) {
+		if(r == 9) {
+			return true;
+		}
+		if(get(r, c) == 0) {
+			for(int i = 1; i < 10; i++) {
+				set(r, c, i);
+					if(isValid(r,c)) {
+						if(c == 8) {
+							c = 0;
+							if(solve(r + 1, c)) {
+								return true;
+							}
+						} else {
+							if(solve(r, c + 1)) {
+								return true;
+							}
+						}
+				}
+			}
+			set(r, c, 0);
+			return false;
+		}
+		else if (get(r, c) > 0){
+			if(isValid(r,c)) {
+				if(c == 8) {
+					c = 0;
+					if(solve(r + 1, c)) {
+						return true;
+					}
+				} else {
+					if(solve(r, c + 1)) {
+						return true;			
+			}
+		
+				}
+			}
+		}
+		return isAllValid();
+	}		
+
+	@Override
+	public void set(int row, int col, int digit) {
+		if(row < 0 || row > 8 || col < 0 || col > 8 || digit > 9 || digit < 0) {
+			throw new IllegalArgumentException();
+		}
+		board[row][col] = digit;
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int get(int row, int col) {		
+		if(row < 0 || row > 8 || col < 0 || col > 8) {
+			throw new IllegalArgumentException();
+		}
+		// TODO Auto-generated method stub
+		return board[row][col];
+	}
+
+	@Override
+	public void clear(int row, int col) {
+		if(row < 0 || row > 8 || col < 0 || col > 8) {
+			throw new IllegalArgumentException();
+		}
+		board[row][col] = 0;
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void clearAll() {
+		for(int i = 0; i < 9; i++) {
+			for(int k = 0; k < 9; k++) {
+				clear(i, k);
+			}
+		}
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isValid(int row, int col) {
+		if(row < 0 || row > 8 || col < 0 || col > 8) {
+			throw new IllegalArgumentException();
+		}
+		//checks row and col
+		int rowCount = 0;
+		int colCount = 0;
+		for(int i = 0; i < 9; i++) {
+				if(board[row][i] == get(row, col)) {
+					rowCount++;
+				}
+				if(board[i][col] == get(row, col)) {
+					colCount ++;
+				}
+			}
+		int bigRow = 3;
+		int bigCol = 3;
+		if(row < 3) {
+			bigRow = bigRow - 3;
+		} else if (row > 5) {
+			bigRow = bigRow + 3;
+		}
+		if(col < 3) {
+			bigCol = bigCol - 3;
+		} else if (col > 5) {
+			bigCol = bigCol + 3;
+		}
+		int boxCount = 0;
+		for(int r = 0; r < 3; r++) {
+			for(int c = 0; c < 3; c++) {
+				if(board[r + bigRow][c+bigCol] == get(row,col)) {
+					boxCount++;
+				}
+			}
+		}
+		
+		if(rowCount + colCount + boxCount == 3) {
+		boardCorrect[row][col] = true;
+		return true;
+		} 
+		return false;
+	}
+	
+
+	@Override
+	public boolean isAllValid() {
+		for(int r = 0; r < 9; r++) {
+			for(int c = 0; c < 9; c++) {
+				if(boardCorrect[r][c] == false) {
+					return false;
+				}
+			}
+		}
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public void setGrid(int[][] m) {
+		for(int r = 0; r < 9; r++) {
+			for(int c = 0; c < 9; c++) {
+				set(r, c, m[r][c]);
+			}
+		}
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int[][] getGrid() {
+		// TODO Auto-generated method stub
+		return board;
+	}
+
+}
